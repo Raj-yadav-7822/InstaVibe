@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-const { urlencoded } = express;
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./utils/db.js";
@@ -11,61 +10,42 @@ import { app, server } from "./socket/socket.js";
 import ExpressError from "./utils/ExpressError.js";
 
 dotenv.config();
-const PORT = process.env.PORT || 8080; 
+const PORT = process.env.PORT || 8080;
 
-if (process.env.NODE_ENV !== "production") {
-  console.log(`Server running on port ${PORT}`);
-}
-
-
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    message: "I am get",
-    success: true,
-  });
-});
-
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
-const corsOptions = {
-  origin: process.env.FRONTEND,
-  credentials: true,
-};
+//cors
+const corsOptions = { origin: process.env.FRONTEND, credentials: true };
 app.use(cors(corsOptions));
 
-// APIs
+// Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
 
+// Root
+app.get("/", (req, res) => res.json({ success: true, message: "API Running" }));
 
+// 404 handler
+app.use((req, res, next) => next(new ExpressError(404, "Page Not Found")));
 
-
-//  Handle all unknown routes
-app.use((req, res, next) => {
-  next(new ExpressError(404, "Page Not Found"));
-});
-
-//  Global Error Handler
+// Global Error handler
 app.use((err, req, res, next) => {
-  console.error("Error caught by middleware:", err);
-
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Something went wrong";
-
-  res.status(statusCode).json({
-    success: false,
-    error: {
-      statusCode,
-      message,
-    },
-  });
+  console.error(err);
+  res.status(err.statusCode || 500).json({ success: false, message: err.message || "Server Error" });
 });
 
-// Server
-server.listen(PORT, () => {
-  connectDB();
-  console.log(` Server + MongoDB connected on PORT ${PORT}`);
-});
+// Start server after DB connect
+const startServer = async () => {
+  try {
+    await connectDB();
+    server.listen(PORT, () => console.log(`Server + MongoDB connected on PORT ${PORT}`));
+  } catch (err) {
+    console.error("Failed to connect DB:", err);
+  }
+};
+
+startServer();
