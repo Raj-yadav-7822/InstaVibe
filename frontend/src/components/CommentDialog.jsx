@@ -18,22 +18,22 @@ const CommentDialog = ({ open, setOpen }) => {
   const [comment, setComment] = useState([]);
   const dispatch = useDispatch();
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL; // ✅ use env base URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL; 
 
-  // ✅ Load comments when post changes
+  //  Load comments when post changes
   useEffect(() => {
     if (selectedPost) {
       setComment(selectedPost.comments);
     }
   }, [selectedPost]);
 
-  // ✅ Input change handler
+  //  Input change handler
   const changeEventHandler = (e) => {
     const inputText = e.target.value;
     setText(inputText.trim() ? inputText : '');
   };
 
-  // ✅ Send Comment Handler
+  //  Send Comment Handler
   const sendMessageHandler = async () => {
     if (!text.trim()) return;
 

@@ -18,7 +18,7 @@ const ChatPage = () => {
 
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-  // ✅ Send message handler
+  //  Send message handler
   const sendMessageHandler = async (receiverId) => {
     if (!textMessage.trim()) return; // Empty message guard
 
@@ -41,14 +41,14 @@ const ChatPage = () => {
     }
   };
 
-  // ✅ Clear selected user on unmount
+  
   useEffect(() => {
     return () => {
       dispatch(setSelectedUser(null));
     };
   }, [dispatch]);
 
-  // ✅ Mark messages as read when chat is opened
+  
   useEffect(() => {
     dispatch(markMessagesAsRead());
   }, [dispatch]);

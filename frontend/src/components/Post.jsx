@@ -20,7 +20,7 @@ function Post({ post }) {
   const [comment, setComment] = useState(post.comments);
   const dispatch = useDispatch();
 
-  // ✅ Base API URL from .env
+  //  API URL from .env
   const API_URL = import.meta.env.VITE_API_URL;
 
   const changeEventHandler = (e) => {

@@ -30,21 +30,21 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ✅ Use your .env API base
+ 
   const API = import.meta.env.VITE_API_URL;
 
-  // ✅ File change handler
+  //  File change handler
   const fileChangeHandler = (e) => {
     const file = e.target.files?.[0];
     if (file) setInput({ ...input, profilePhoto: file });
   };
 
-  // ✅ Gender select handler
+  //  Gender select handler
   const selectChangeHandler = (value) => {
     setInput({ ...input, gender: value });
   };
 
-  // ✅ Submit handler
+  //  Submit handler
   const editProfileHandler = async () => {
     const formData = new FormData();
     formData.append('bio', input.bio);
@@ -92,7 +92,7 @@ const EditProfile = () => {
             <div className="flex flex-col overflow-hidden w-full">
               <h1 className="font-bold text-sm md:text-lg truncate">{user?.username}</h1>
               
-              {/* ✅ Responsive long bio */}
+              {/* Responsive  bio */}
               <span className="text-gray-600 text-xs md:text-sm break-words max-w-full whitespace-pre-wrap">
                 {user?.bio || 'Bio here...'}
               </span>

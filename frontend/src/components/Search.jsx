@@ -8,7 +8,7 @@ function Search() {
   const [results, setResults] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ Base API URL from .env
+  //  Base API URL from .env
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
