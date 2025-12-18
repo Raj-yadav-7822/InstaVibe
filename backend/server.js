@@ -13,7 +13,11 @@ import messageRoutes from "./routes/messages.js";
 connectDB(process.env.MONGODB_URI);
 
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,
+  credentials: true,  
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // static uploads if needed
@@ -26,9 +30,12 @@ app.use("/api/messages", messageRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: process.env.FRONTEND_URL || "*" },
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
-
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {

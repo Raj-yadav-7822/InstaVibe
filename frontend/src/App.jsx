@@ -48,10 +48,10 @@ function App() {
     if (user) {
       console.log("Connecting socket for user:", user._id);
 
-      const socketio = io("http://localhost:8080", {
-        query: { userId: user?._id },
-        transports: ["websocket"],
-      });
+ const socketio = io(import.meta.env.VITE_SOCKET_URL, {
+  query: { userId: user?._id },
+  transports: ["websocket"],
+});
 
       dispatch(setSocket(socketio));
 

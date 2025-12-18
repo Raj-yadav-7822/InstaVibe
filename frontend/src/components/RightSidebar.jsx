@@ -24,7 +24,7 @@ const RightSidebar = () => {
             <h1 className='font-semibold text-sm truncate'>
               <Link to={`/profile/${user?._id}`}>{user?.username}</Link>
             </h1>
-            {/* ✅ Responsive multi-line bio */}
+            {/* Responsive multi-line bio */}
             <span className='text-gray-600 text-sm break-words whitespace-pre-wrap block'>
               {user?.bio || 'Bio here...'}
             </span>
@@ -69,7 +69,7 @@ const RightSidebar = () => {
                     {user?.username}
                   </Link>
                 </h1>
-                {/* ✅ Multi-line responsive bio on mobile */}
+                {/*  Multi-line responsive bio on mobile */}
                 <span className='text-gray-600 text-sm break-words whitespace-pre-wrap block'>
                   {user?.bio || 'Bio here...'}
                 </span>
