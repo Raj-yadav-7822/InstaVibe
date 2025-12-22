@@ -20,8 +20,8 @@ const isAuthenticated = (req, res, next) => {
       });
     }
 
-   
-    req.id = decode.id;
+  
+    req.id = decode.userId;  
 
     next();
   } catch (error) {
