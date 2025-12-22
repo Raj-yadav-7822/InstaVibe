@@ -12,7 +12,7 @@ import { setPosts } from '@/redux/postSlice'
 
 const CreatePost = ({ open, setOpen }) => {
   const imageRef = useRef()
-  const [file, setFile] = useState('')
+  const [file, setFile] = useState(null)
   const [caption, setCaption] = useState('')
   const [imagePreview, setImagePreview] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,19 +21,29 @@ const CreatePost = ({ open, setOpen }) => {
   const dispatch = useDispatch()
   const { posts } = useSelector(store => store.post)
 
+  // File selection handler
   const fileChangeHandler = async e => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFile(file)
-      const dataUrl = await readFileAsDataURL(file)
-      setImagePreview(dataUrl)
-    }
+    const selectedFile = e.target.files?.[0]
+    if (!selectedFile) return
+    setFile(selectedFile)
+    const dataUrl = await readFileAsDataURL(selectedFile)
+    setImagePreview(dataUrl)
   }
 
+  // Create Post handler
   const createPostHandler = async e => {
+    e.preventDefault()
+
+    if (loading) return
+
+    if (!caption.trim() || !file) {
+      toast.error('Caption and image are required!')
+      return
+    }
+
     const formData = new FormData()
-    formData.append('caption', caption)
-    if (imagePreview) formData.append('image', file)
+    formData.append('caption', caption.trim())
+    formData.append('image', file)
 
     try {
       setLoading(true)
@@ -49,13 +59,16 @@ const CreatePost = ({ open, setOpen }) => {
       if (res.data.success) {
         dispatch(setPosts([res.data.post, ...posts]))
         toast.success(res.data.message)
+
+        // Reset form
         setOpen(false)
         setCaption('')
-        setFile('')
+        setFile(null)
         setImagePreview('')
+        if (imageRef.current) imageRef.current.value = ''
       }
     } catch (error) {
-      console.error(error)
+      console.error('CreatePost Error:', error)
       toast.error(error.response?.data?.message || 'Something went wrong!')
     } finally {
       setLoading(false)
@@ -75,7 +88,10 @@ const CreatePost = ({ open, setOpen }) => {
         {/* User Info */}
         <div className="flex items-center gap-3 mt-3">
           <Avatar>
-            <AvatarImage src={user?.profilePicture} alt="createpost_image" />
+            <AvatarImage
+              src={user?.profilePicture || '/default-avatar.png'}
+              alt={user?.username || 'User avatar'}
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex flex-col max-w-[70%]">
@@ -110,32 +126,27 @@ const CreatePost = ({ open, setOpen }) => {
           ref={imageRef}
           type="file"
           className="hidden"
+          accept="image/*"
           onChange={fileChangeHandler}
         />
         <Button
-          onClick={() => imageRef.current.click()}
+          onClick={() => imageRef.current?.click()}
           className="w-fit mx-auto mt-4 bg-[#0095F6] hover:bg-[#258bcf]"
         >
           Select from device
         </Button>
 
         {/* Post Button */}
-        {imagePreview && (
+        {file && (
           <div className="mt-4">
-            {loading ? (
-              <Button className="w-full" disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </Button>
-            ) : (
-              <Button
-                onClick={createPostHandler}
-                type="submit"
-                className="w-full"
-              >
-                Post
-              </Button>
-            )}
+            <Button
+              onClick={createPostHandler}
+              className="w-full flex items-center justify-center"
+              disabled={loading}
+            >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? 'Please wait...' : 'Post'}
+            </Button>
           </div>
         )}
       </DialogContent>
