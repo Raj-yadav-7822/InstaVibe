@@ -5,17 +5,34 @@ import { User } from "../model/user.model.js";
 import { Comment } from "../model/comment.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 import wrapAsyncHandler from "../utils/wrapAsync.js";
-
+import jwt from "jsonwebtoken";
 // Add New Post
 export const addNewPost = wrapAsyncHandler(async (req, res) => {
   const { caption } = req.body;
   const image = req.file;
-  const authorId = req.id;
 
-  if (!image)
-    return res.status(400).json({ message: "Image required", success: false });
+  
+  if (!image) {
+    return res
+      .status(400)
+      .json({ message: "Image required", success: false });
+  }
 
-  // Optimize and upload image
+
+  const token = req.cookies.token; 
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  let authorId;
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    authorId = decoded.userId;
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
+  
   const optimizedImageBuffer = await sharp(image.buffer)
     .resize({ width: 800, height: 800, fit: "inside" })
     .toFormat("jpeg", { quality: 80 })
@@ -24,12 +41,21 @@ export const addNewPost = wrapAsyncHandler(async (req, res) => {
   const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
     "base64"
   )}`;
-  const cloudResponse = await cloudinary.uploader.upload(fileUri);
+
+  let cloudResponse;
+  try {
+    cloudResponse = await cloudinary.uploader.upload(fileUri);
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Image upload failed" });
+  }
 
   const post = await Post.create({
     caption,
     image: cloudResponse.secure_url,
-    author: authorId,
+    author: authorId, // ✅ required field filled
   });
 
   const user = await User.findById(authorId);
@@ -38,7 +64,9 @@ export const addNewPost = wrapAsyncHandler(async (req, res) => {
     await user.save();
   }
 
+
   await post.populate({ path: "author", select: "-password" });
+
 
   return res.status(201).json({
     message: "New post added",
