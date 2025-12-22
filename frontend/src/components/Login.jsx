@@ -54,8 +54,12 @@ const Login = () => {
     <div className='flex items-center w-screen h-screen justify-center'>
       <form onSubmit={loginHandler} className='shadow-lg flex flex-col gap-5 p-8'>
         <div className='my-4'>
-          <h1   className="my-8 pl-3 font-extrabold text-3xl text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-blue-700 cursor-pointer tracking-tight"
-  style={{ fontFamily: "'Inter', sans-serif" }}>InstaVibe</h1>
+<h1
+  className="my-8 text-center font-extrabold text-3xl text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-blue-700 cursor-pointer tracking-tight"
+  style={{ fontFamily: "'Inter', sans-serif" }}
+>
+  InstaVibe
+</h1>
           <p className='text-sm text-center'>Login to see photos & videos from your friends</p>
         </div>
 
