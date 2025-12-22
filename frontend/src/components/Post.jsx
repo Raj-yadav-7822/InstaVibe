@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
+import { Link } from 'react-router-dom';
 
 function Post({ post }) {
   const [text, setText] = useState("");
@@ -102,6 +103,7 @@ function Post({ post }) {
       {/* Header */}
       <div className='flex items-center justify-between px-3 py-2'>
         <div className='flex items-center gap-2'>
+          <Link to={`/profile/${post.author?._id}`}></Link>
           <Avatar className="h-10 w-10">
             <AvatarImage
               src={post.author?.profilePicture}
