@@ -191,7 +191,7 @@ function Post({ post }) {
         />
         {text && (
           <span onClick={commentHandler} className="text-blue-500 cursor-pointer">
-            Post
+            Posts
           </span>
         )}
       </div>
