@@ -189,39 +189,62 @@ export const dislikePost = wrapAsyncHandler(async (req, res) => {
 
 // Add Comment
 export const addComment = wrapAsyncHandler(async (req, res) => {
-  const postId = req.params.id;
-  const commentKrneWalaUserKiId = req.id;
-  const { text } = req.body;
+  try {
+    const postId = req.params.id;
+    const commentKrneWalaUserKiId = req.id; 
+    const { text } = req.body;
 
-  if (!text)
+    // Validation
+    if (!text) {
+      return res
+        .status(400)
+        .json({ message: "Text is required", success: false });
+    }
+
+    if (!commentKrneWalaUserKiId) {
+      return res
+        .status(401)
+        .json({ message: "User not authenticated", success: false });
+    }
+
+    // Check if post exists
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
+    }
+
+    // Create comment
+    const comment = await Comment.create({
+      text,
+      author: commentKrneWalaUserKiId,
+      post: postId,
+    });
+
+    // Populate author info
+    await comment.populate({
+      path: "author",
+      select: "username profilePicture",
+    });
+
+    // Add comment to post
+    post.comments.push(comment._id);
+    await post.save();
+
+    return res.status(201).json({
+      message: "Comment Added",
+      comment,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error adding comment:", error);
     return res
-      .status(400)
-      .json({ message: "Text is required", success: false });
-
-  const post = await Post.findById(postId);
-  if (!post)
-    return res.status(404).json({ message: "Post not found", success: false });
-
-  const comment = await Comment.create({
-    text,
-    author: commentKrneWalaUserKiId,
-    post: postId,
-  });
-
-  await comment.populate({
-    path: "author",
-    select: "username profilePicture",
-  });
-
-  post.comments.push(comment._id);
-  await post.save();
-
-  return res.status(201).json({
-    message: "Comment Added",
-    comment,
-    success: true,
-  });
+      .status(500)
+      .json({ message: "Internal Server Error", success: false });
+  }
 });
+
 
 // Get Comments of a Post
 export const getCommentsOfPost = wrapAsyncHandler(async (req, res) => {
