@@ -80,11 +80,16 @@ export const login = async (req, res) => {
             following: user.following,
             posts: populatedPosts
         }
-        return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
-            message: `Welcome back ${user.username}`,
-            success: true,
-            user
-        });
+    return res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,        
+  sameSite: 'none',    
+  maxAge: 1 * 24 * 60 * 60 * 1000
+}).json({
+  message: `Welcome back ${user.username}`,
+  success: true,
+  user
+});
 
     } catch (error) {
         console.log(error);
@@ -92,10 +97,15 @@ export const login = async (req, res) => {
 };
 export const logout = async (_, res) => {
     try {
-        return res.cookie("token", "", { maxAge: 0 }).json({
-            message: 'Logged out successfully.',
-            success: true
-        });
+        return res.cookie("token", "", {
+  httpOnly: true,
+  secure: true,        
+  sameSite: "none",   
+  maxAge: 0
+}).json({
+  message: 'Logged out successfully.',
+  success: true
+});
     } catch (error) {
         console.log(error);
     }

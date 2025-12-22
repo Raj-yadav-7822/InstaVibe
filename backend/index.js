@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 //cors
-const corsOptions = { origin: process.env.FRONTEND, credentials: true };
+const corsOptions = { origin: "https://insta-vibe-rose.vercel.app", credentials: true };
 app.use(cors(corsOptions));
 
 // Routes
